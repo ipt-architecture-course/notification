@@ -43,29 +43,64 @@
 #         except SystemExit:
 #             os._exit(0)
 
+# import pika
+
+# def queue1_callback(ch, method, properties, body):
+#     print(" [x] Received queue 1: %r" % body)
+
+# def queue2_callback(ch, method, properties, body):
+#     print(" [x] Received queue 2: %r" % body)
+
+# def on_open(connection):
+#     connection.channel(on_open_callback = on_channel_open)
+
+
+# def on_channel_open(channel):
+#     channel.basic_consume('email_notification', queue1_callback, auto_ack = True)
+#     channel.basic_consume('status_notification', queue2_callback, auto_ack = True)
+#     channel.basic_qos(prefetch_count=1)
+
+# # credentials = pika.PlainCredentials('u', 'p')
+# parameters = pika.ConnectionParameters('localhost') #, 5672, '/', credentials)
+# connection = pika.SelectConnection(parameters = parameters, on_open_callback = on_open)
+
+# try:
+#     connection.ioloop.start()
+# except KeyboardInterrupt:
+#     connection.close()
+#     connection.ioloop.start()
+
+
+#!/usr/bin/env python
 import pika
+import sys
 
-def queue1_callback(ch, method, properties, body):
-    print(" [x] Received queue 1: %r" % body)
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host='localhost'))
+channel = connection.channel()
 
-def queue2_callback(ch, method, properties, body):
-    print(" [x] Received queue 2: %r" % body)
+channel.exchange_declare(exchange='notification', exchange_type='topic')
 
-def on_open(connection):
-    connection.channel(on_open_callback = on_channel_open)
+result = channel.queue_declare('', exclusive=True)
+queue_name = result.method.queue
+
+binding_keys = sys.argv[1:]
+if not binding_keys:
+    sys.stderr.write("Usage: %s [binding_key]...\n" % sys.argv[0])
+    sys.exit(1)
+
+for binding_key in binding_keys:
+    channel.queue_bind(
+        exchange='topic_logs', queue=queue_name, routing_key=binding_key)
+
+print(' [*] Waiting for logs. To exit press CTRL+C')
 
 
-def on_channel_open(channel):
-    channel.basic_consume('email_notification', queue1_callback, auto_ack = True)
-    channel.basic_consume('status_notification', queue2_callback, auto_ack = True)
-    channel.basic_qos(prefetch_count=1)
+def callback(ch, method, properties, body):
+    print(f" [x] {method.routing_key}:{body}")
 
-# credentials = pika.PlainCredentials('u', 'p')
-parameters = pika.ConnectionParameters('localhost') #, 5672, '/', credentials)
-connection = pika.SelectConnection(parameters = parameters, on_open_callback = on_open)
 
-try:
-    connection.ioloop.start()
-except KeyboardInterrupt:
-    connection.close()
-    connection.ioloop.start()
+channel.basic_consume(
+    queue=queue_name, on_message_callback=callback, auto_ack=True)
+
+channel.start_consuming()
