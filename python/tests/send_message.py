@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import pika
 import os
 import json
@@ -24,7 +23,7 @@ channel.exchange_declare(exchange=exchange_name, exchange_type='topic')
 # Mensagem a ser enviada
 message = json.dumps({
     'recipient':"novousuario@teste.com.br",
-    'message':"""
+    'body':"""
         <html>
             <body>
                 <h1>Bem-vindo ao MailHog!</h1>
@@ -41,7 +40,7 @@ print(f" [x] Enviada mensagem '{message}' para o binding key notification.email"
 # Notificação de Status via Email
 message = json.dumps({
     'recipient':"novousuario@teste.com.br",
-    'message':"""
+    'body':"""
         <html>
             <body>
                 <h1>Notificação de Status Via Email</h1>
@@ -59,7 +58,7 @@ print(f" [x] Enviada mensagem '{message}' para o binding key notification.status
 # Notificação de Status via Push Notification
 message = json.dumps({
     'recipient':"http://example.com/my-topic",
-    'message':'Atualização de Perfil',
+    'body':'Atualização de Perfil',
     'subject':'Notificação de Status',
     'type':'push'
 })
@@ -68,7 +67,7 @@ print(f" [x] Enviada mensagem '{message}' para o binding key notification.status
 
 message = json.dumps({
     'recipient':"http://example.com/my-topic",
-    'message':'Atualização de Fotos',
+    'body':'Atualização de Fotos',
     'subject':'Notificação de Status',
     'type':'push'
 })

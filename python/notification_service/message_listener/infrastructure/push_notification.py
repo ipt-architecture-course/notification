@@ -22,7 +22,7 @@ class PushNotification(NotificationService):
     def dispatch_notification(self):
         """Envia a notificação via Mercure."""
         hub_url = os.environ['HUB_URL']
-        jwt_token = self.generate_token(os.environ['MERCURE_PUBLISHER_JWT_KEY'])
+        jwt_token = self.generate_token(key=os.environ['MERCURE_PUBLISHER_JWT_KEY'],claim_type="publish")
 
         headers = {"Authorization": f"Bearer {jwt_token}","Content-Type": "application/x-www-form-urlencoded",}
         payload = {"topic": self.notification_configuration['recipient'], "data": self.notification_configuration['body']}
