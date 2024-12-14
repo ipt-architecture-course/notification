@@ -106,9 +106,9 @@ Responsável por escutar mensagens em filas e acionar os mecanismos apropriados 
    docker-compose -f docker-compose-services.yml up --build
    ```
 
-### Uso 
+### Uso
 
-Em terminais separados, seguir os seguintes passos:
+Em terminais separados e com os serviços já iniciados, seguir os seguintes passos:
 
 1. **Iniciar o Listener:**
    O listener é responsável por processar mensagens na fila:
@@ -117,26 +117,26 @@ Em terminais separados, seguir os seguintes passos:
    python python/listen_queue.py
    ```
 
-2. **Enviar Mensagens para a Fila:**
-   - Utilizar do script `python` no diretório `test`:
-
-   ```bash
-    python python/test/send_message.py
-   ```
-
-3. **Verificar Logs:**
-   - Monitore os logs para garantir que as notificações estão sendo enviadas corretamente.
-
-   ```bash
-   docker logs -f <nome-do-container>
-   ```
-
-4. **Consumir Push Notifications:**
+2. **Consumir Push Notifications:**
    - Receber push notifications:
 
    ```bash
    python python/test/listen_mercure.py
    ```
 
-5. **Verificar e-mails:**
+3. **Verificar e-mails:**
    - Abrir o browser no seguinte endereço: <http://localhost:8025>
+
+4. **Enviar Mensagens para a Fila:**
+   - Utilizar do script `python` no diretório `test`:
+
+   ```bash
+    python python/test/send_message.py
+   ```
+
+5. **Verificar Logs (Opcional):**
+   - Monitore os logs para garantir que as notificações estão sendo enviadas corretamente.
+
+   ```bash
+   docker logs -f <nome-do-container>
+   ```
